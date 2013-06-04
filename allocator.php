@@ -3,7 +3,8 @@
  * Dirty PHP Example of a User Allocation
  *
  * Used at NJIT for PLA
- *
+ * See also previous work {@link http://web.njit.edu/~mt85/UsersAlg.php}
+ * 
  * @license MIT
  */
 
@@ -27,5 +28,6 @@ function random_name() {
 }
 
 class Allocator {
-
+	public $students = [];
+	public $instructor = 
 }
