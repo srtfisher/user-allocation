@@ -57,20 +57,25 @@ class Allocator {
 		return trim($line);
 	}
 
+	/**
+	 * Grunt work to assign users
+	 * 
+	 * @return void
+	 */
 	public function assign_users()
 	{
-
+		if (count($this->roles) == 0)
+			throw new Exception('Roles are not defined for allocation.');
 	}
 
 	/**
 	 * Add a user role (problem creator, solver, etc)
 	 *
 	 * @param string
-	 * @param array
 	 */
-	public function create_role($name, array $rules)
+	public function create_role($name)
 	{
-		$this->roles[$name] = $rules;
+		$this->roles[] = $name;
 	}
 
 	/**
@@ -86,37 +91,18 @@ class Allocator {
 
 $allocator = new Allocator();
 
-// Adding the rules
-$allocator->create_role('problem creator', [
-
-]);
-
-$allocator->create_role('problem solver', [
-	'unique to' => [
-		'problem creator',
-		'evaulator 1',
-		'evaulator 2',
-	]
-]);
-
-$allocator->create_role('evaulator 1', [
-	'unique to' => [
-		'problem creator',
-		'problem solver',
-		'evaulator 2',
-	]
-]);
-
-$allocator->create_role('evaulator 2', [
-	'unique to' => [
-		'problem creator',
-		'problem solver',
-		'evaulator 1',
-	]
-]);
+// Adding the roles
+$allocator->create_role('problem creator');
+$allocator->create_role('problem solver');
+$allocator->create_role('evaluator 1');
+$allocator->create_role('evaluator 2');
 
 // Assign
-$allocator->assign_users();
+try {
+	$allocator->assign_users();
+} catch (Exception $e) {
+	die(sprintf('ERROR: <strong>%s</strong>', $e->getMessage()));
+}
 
 $allocator->dump();
 
