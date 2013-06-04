@@ -132,7 +132,6 @@ class Allocator {
 	 */
 	public function can_enter_workflow($student, $workflow)
 	{
-		var_dump($this->students[$student], $workflow);
 		foreach($workflow as $role => $assigne)
 		{
 			if ((int) $assigne == (int) $student)
@@ -187,10 +186,6 @@ class Allocator {
 	 */
 	public function dump()
 	{
-		//@header("Content-Type: text/plain");
-
-		//var_dump($this->workflows);
-		
 		?>
 <table width="100%" border="1">
 	<thead>
