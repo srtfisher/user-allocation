@@ -11,10 +11,13 @@
 class Allocator {
 	public $students = [];
 	public $instructor;
-	public static $min_size = 4;
+	public static $min_size = 10;
 	public static $max_size = 40;
 	public $workflows = [];
+
 	private $roles = [];
+	private $roles_rules = [];
+
 	private $roles_queue = [];
 
 	/**
@@ -84,6 +87,37 @@ class Allocator {
 			shuffle($this->roles_queue[$role]);
 		endforeach;
 
+		// Go though the workflows
+		foreach($this->workflows as $student => $workflow)
+		{
+
+			foreach($workflow as $workflow_role => $ignore) :
+				$attempt_student = reset($this->roles_queue[$workflow_role]);
+				$assigned = false;
+				$i = 0;
+
+				while(! $assigned) {
+					$i++;
+
+					if ($i > count($this->students))
+						break;
+
+					// They're not a match!
+					if (! $this->can_enter_workflow($attempt_student, $workflow))
+					{
+						// Point to the next student
+						$attempt_student = next($this->roles_queue[$workflow_role]);
+						continue;
+					}
+
+					$this->workflows[$student][$workflow_role] = $attempt_student;
+
+					// Remove this student off the queue to be added for such role
+					array_shift($this->roles_queue[$workflow_role]);
+					$assigned = TRUE;
+				}
+			endforeach;
+		}
 	}
 
 	/**
@@ -124,10 +158,12 @@ class Allocator {
 	 * Add a user role (problem creator, solver, etc)
 	 *
 	 * @param string
+	 * @param string
 	 */
-	public function create_role($name)
+	public function create_role($name, $rules = [])
 	{
 		$this->roles[] = $name;
+		$this->roles_rules[$name] = $rules;
 	}
 
 	/**
