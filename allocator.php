@@ -15,6 +15,7 @@ class Allocator {
 	public static $max_size = 40;
 	public $workflows = [];
 	private $roles = [];
+	private $roles_queue = [];
 
 	/**
 	 * @var array
@@ -75,7 +76,34 @@ class Allocator {
 			$this->workflows[$student] = $this->empty_workflow();
 		
 
+		// Now let's find the assignes
+		foreach($this->roles as $role) :
+			$this->roles_queue[$role] = $this->students;
 
+			// Let's keep this very random
+			shuffle($this->roles_queue[$role]);
+		endforeach;
+
+	}
+
+	/**
+	 * Identify if a user can enter a specific workflow
+	 *
+	 * Helper function to see if a user is already in a
+	 * workflow (cannot join then).
+	 * 
+	 * @param string
+	 * @param array
+	 * @return bool
+	 */
+	public function can_enter_workflow($student, $workflow)
+	{
+		foreach($workflow as $role => $assigne)
+		{
+			if ($assigne == $student)
+				return FALSE;
+		}
+		return TRUE;
 	}
 
 	/**
@@ -144,21 +172,3 @@ class Allocator {
 <?php
 	}
 }
-
-$allocator = new Allocator();
-
-// Adding the roles
-$allocator->create_role('problem creator');
-$allocator->create_role('problem solver');
-$allocator->create_role('evaluator 1');
-$allocator->create_role('evaluator 2');
-
-// Assign
-try {
-	$allocator->assign_users();
-} catch (Exception $e) {
-	die(sprintf('ERROR: <strong>%s</strong>', $e->getMessage()));
-}
-
-$allocator->dump();
-
