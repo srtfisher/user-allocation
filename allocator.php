@@ -9,21 +9,21 @@
  */
 
 class Allocator {
-	private $students = [];
+	private $students = array();
 	private $instructor;
 	public static $min_size = 10;
 	public static $max_size = 40;
-	private $workflows = [];
+	private $workflows = array();
 
-	private $roles = [];
-	private $roles_rules = [];
+	private $roles = array();
+	private $roles_rules = array();
 
-	private $roles_queue = [];
+	private $roles_queue = array();
 
 	/**
 	 * @var array
 	 */
-	private $names = [];
+	private $names = array();
 
 	public function __construct()
 	{
@@ -72,7 +72,7 @@ class Allocator {
 			throw new Exception('Roles are not defined for allocation.');
 
 		// Reset it
-		$this->workflows = [];
+		$this->workflows = array();
 
 		// First run, add all work flows with the respective roles not defined yet
 		foreach ($this->students as $student_id => $student)
@@ -161,7 +161,7 @@ class Allocator {
 	 */
 	public function empty_workflow()
 	{
-		$i = [];
+		$i = array();
 		foreach($this->roles as $r) $i[$r] = NULL;
 
 		return $i;
@@ -173,7 +173,7 @@ class Allocator {
 	 * @param string
 	 * @param string
 	 */
-	public function create_role($name, $rules = [])
+	public function create_role($name, $rules = array())
 	{
 		$this->roles[] = $name;
 		$this->roles_rules[$name] = $rules;
