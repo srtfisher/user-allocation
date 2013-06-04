@@ -75,21 +75,23 @@ class Allocator {
 		$this->workflows = [];
 
 		// First run, add all work flows with the respective roles not defined yet
-		foreach ($this->students as $student)
-			$this->workflows[$student] = $this->empty_workflow();
+		foreach ($this->students as $student_id => $student)
+			$this->workflows[$student_id] = $this->empty_workflow();
 		
 
 		// Now let's find the assignes
 		foreach($this->roles as $role) :
-			$this->roles_queue[$role] = $this->students;
+			// Get just their student IDs
+			$this->roles_queue[$role] = array_keys($this->students);
 
 			// Let's keep this very random
 			shuffle($this->roles_queue[$role]);
 		endforeach;
 
 		// Go though the workflows
-		foreach($this->workflows as $student => $workflow)
+		foreach($this->workflows as $student_id => $workflow)
 		{
+			$running_counter = 0;
 
 			foreach($workflow as $workflow_role => $ignore) :
 				$attempt_student = reset($this->roles_queue[$workflow_role]);
@@ -110,7 +112,7 @@ class Allocator {
 						continue;
 					}
 
-					$this->workflows[$student][$workflow_role] = $attempt_student;
+					$this->workflows[$student_id][$workflow_role] = $attempt_student;
 
 					// Remove this student off the queue to be added for such role
 					array_shift($this->roles_queue[$workflow_role]);
@@ -134,7 +136,7 @@ class Allocator {
 	{
 		foreach($workflow as $role => $assigne)
 		{
-			if ($assigne == $student)
+			if (trim($assigne) == trim($student))
 				return FALSE;
 		}
 		return TRUE;
@@ -147,7 +149,7 @@ class Allocator {
 	 */
 	public function contains_error($workflow)
 	{
-		if ($workflow !== array_unique($workflow, SORT_STRING))
+		if ($workflow !== array_unique($workflow, SORT_NUMERIC))
 			return TRUE;
 		else
 			return FALSE;
@@ -201,15 +203,15 @@ class Allocator {
 		</tr>
 	</thead>
 	<tbody>
-		<?php foreach($this->workflows as $name => $workflow) : ?>
+		<?php foreach($this->workflows as $student_id => $workflow) : ?>
 			<tr <?php if ($this->contains_error($workflow)) echo 'bgcolor="orange"'; ?>>
-				<th><?php echo $name; ?></th>
+				<th><?php echo $this->students[$student_id]; ?></th>
 
 				<?php foreach($workflow as $role => $assigne) :
 					if ($assigne == NULL) :
 						?><td bgcolor="red">NONE</td><?php
 					else :
-						?><td><?php echo $assigne; ?></td><?php
+						?><td><?php echo $this->students[$assigne]; ?></td><?php
 					endif;
 				endforeach; ?>
 			</tr>

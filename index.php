@@ -12,7 +12,7 @@ require 'allocator.php';
 $allocator = new Allocator();
 
 // Adding the roles
-$allocator->create_role('problem creator');
+//$allocator->create_role('problem creator');
 $allocator->create_role('problem solver');
 $allocator->create_role('evaluator 1', ['problem creator', 'problem solver']);
 $allocator->create_role('evaluator 2', ['problem creator', 'problem solver']);
