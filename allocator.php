@@ -13,7 +13,7 @@ class Allocator {
 	public $instructor;
 	public static $min_size = 4;
 	public static $max_size = 40;
-	public $assignments = [];
+	public $workflows = [];
 	private $roles = [];
 
 	/**
@@ -66,6 +66,30 @@ class Allocator {
 	{
 		if (count($this->roles) == 0)
 			throw new Exception('Roles are not defined for allocation.');
+
+		// Reset it
+		$this->workflows = [];
+
+		// First run, add all work flows with the respective roles not defined yet
+		foreach ($this->students as $student)
+			$this->workflows[$student] = $this->empty_workflow();
+		
+
+
+	}
+
+	/**
+	 * Empty Workflow
+	 * The default values for a workflow
+	 *
+	 * @return array
+	 */
+	public function empty_workflow()
+	{
+		$i = [];
+		foreach($this->roles as $r) $i[$r] = NULL;
+
+		return $i;
 	}
 
 	/**
@@ -85,7 +109,39 @@ class Allocator {
 	 */
 	public function dump()
 	{
+		//@header("Content-Type: text/plain");
 
+		//var_dump($this->workflows);
+		
+		?>
+<table width="100%" border="1">
+	<thead>
+		<tr>
+			<th>&nbsp;</th>
+			<?php foreach($this->roles as $role) : ?>
+				<th><?php echo $role; ?></th>
+			<?php endforeach; ?>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach($this->workflows as $name => $workflow) : ?>
+			<tr>
+				<th><?php echo $name; ?></th>
+
+				<?php foreach($workflow as $role => $assigne) :
+					if ($assigne == NULL) :
+						?><td bgcolor="red">NONE</td><?php
+					else :
+						?><td><?php echo $assigne; ?></td><?php
+					endif;
+				endforeach; ?>
+			</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+
+<p><strong>Total Students:</strong> <?php echo count($this->students); ?></p>
+<?php
 	}
 }
 
