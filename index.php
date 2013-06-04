@@ -8,6 +8,11 @@
  * @license MIT
  */
 
+$mtime = microtime(); 
+$mtime = explode(" ",$mtime); 
+$mtime = $mtime[1] + $mtime[0]; 
+$starttime = $mtime; 
+
 require 'allocator.php';
 $allocator = new Allocator();
 
@@ -26,3 +31,9 @@ try {
 
 $allocator->dump();
 
+$mtime = microtime(); 
+$mtime = explode(" ",$mtime); 
+$mtime = $mtime[1] + $mtime[0]; 
+$endtime = $mtime; 
+$totaltime = ($endtime - $starttime); 
+echo "<p>Created in ".$totaltime." seconds.</p>"; 
