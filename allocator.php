@@ -9,11 +9,11 @@
  */
 
 class Allocator {
-	public $students = [];
-	public $instructor;
+	private $students = [];
+	private $instructor;
 	public static $min_size = 10;
 	public static $max_size = 40;
-	public $workflows = [];
+	private $workflows = [];
 
 	private $roles = [];
 	private $roles_rules = [];
@@ -178,6 +178,17 @@ class Allocator {
 		$this->roles[] = $name;
 		$this->roles_rules[$name] = $rules;
 	}
+
+	/**
+	 * Get the Workflows
+	 *
+	 * @return array
+	 */
+	public function getWorkflows()
+	{
+		return $this->workflows;
+	}
+
 
 	/**
 	 * Dump the details of the allocation
