@@ -91,8 +91,6 @@ class Allocator {
 		// Go though the workflows
 		foreach($this->workflows as $student_id => $workflow)
 		{
-			$running_counter = 0;
-
 			foreach($workflow as $workflow_role => $ignore) :
 				$attempt_student = reset($this->roles_queue[$workflow_role]);
 				$assigned = false;
@@ -101,11 +99,11 @@ class Allocator {
 				while(! $assigned) {
 					$i++;
 
-					if ($i > count($this->students))
+					if ($i > count($this->roles_queue[$workflow_role]))
 						break;
 
 					// They're not a match!
-					if (! $this->can_enter_workflow($attempt_student, $workflow))
+					if (! $this->can_enter_workflow($attempt_student, $this->workflows[$student_id]))
 					{
 						// Point to the next student
 						$attempt_student = next($this->roles_queue[$workflow_role]);
@@ -128,15 +126,16 @@ class Allocator {
 	 * Helper function to see if a user is already in a
 	 * workflow (cannot join then).
 	 * 
-	 * @param string
+	 * @param int
 	 * @param array
 	 * @return bool
 	 */
 	public function can_enter_workflow($student, $workflow)
 	{
+		var_dump($this->students[$student], $workflow);
 		foreach($workflow as $role => $assigne)
 		{
-			if (trim($assigne) == trim($student))
+			if ((int) $assigne == (int) $student)
 				return FALSE;
 		}
 		return TRUE;
@@ -196,7 +195,7 @@ class Allocator {
 <table width="100%" border="1">
 	<thead>
 		<tr>
-			<th>&nbsp;</th>
+			<th>problem creator</th>
 			<?php foreach($this->roles as $role) : ?>
 				<th><?php echo $role; ?></th>
 			<?php endforeach; ?>
