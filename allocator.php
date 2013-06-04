@@ -25,10 +25,14 @@ class Allocator {
 	 */
 	private $names = array();
 
-	public function __construct()
+	public function __construct($size = 0)
 	{
-		$size = rand(self::$min_size, self::$max_size);
+		if ($size == 0)
+			$size = rand(self::$min_size, self::$max_size);
 		
+		if ($size > 50)
+			die('Size to large.');
+
 		$this->instructor = $this->random_name();
 
 		// Setup the student's names
@@ -47,7 +51,7 @@ class Allocator {
 	public function random_name() {
 		$file = __DIR__.'/names.txt';
 		
-		if ($this->names == NULL) :
+		if (count($this->names) == 0) :
 			$this->names = file($file);
 			shuffle($this->names);
 		endif;

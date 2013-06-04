@@ -14,7 +14,7 @@ $mtime = $mtime[1] + $mtime[0];
 $starttime = $mtime; 
 
 require 'allocator.php';
-$allocator = new Allocator();
+$allocator = new Allocator((isset($_GET['size'])) ? (int) $_GET['size'] : 0);
 
 // Adding the roles
 //$allocator->create_role('problem creator');
