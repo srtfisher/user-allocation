@@ -141,6 +141,19 @@ class Allocator {
 	}
 
 	/**
+	 * Does a workflow contain a duplicate error?
+	 *
+	 * @return bool
+	 */
+	public function contains_error($workflow)
+	{
+		if ($workflow !== array_unique($workflow, SORT_STRING))
+			return TRUE;
+		else
+			return FALSE;
+	}
+
+	/**
 	 * Empty Workflow
 	 * The default values for a workflow
 	 *
@@ -189,7 +202,7 @@ class Allocator {
 	</thead>
 	<tbody>
 		<?php foreach($this->workflows as $name => $workflow) : ?>
-			<tr>
+			<tr <?php if ($this->contains_error($workflow)) echo 'bgcolor="orange"'; ?>>
 				<th><?php echo $name; ?></th>
 
 				<?php foreach($workflow as $role => $assigne) :
