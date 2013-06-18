@@ -202,10 +202,29 @@ class Allocator {
 	public function dump()
 	{
 		?>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function()
+{
+	console.log('ready');
+	$('table td').click(function() {
+		name = $(this).text();
+		
+		// Remove the previous ones
+		$('table td[bgcolor="green"]').removeAttr('bgcolor')
+		
+		$('table td').each(function()
+		{
+			if ($(this).text() == name) {
+				$(this).attr('bgcolor', 'green');
+			}
+		});
+	});
+});
+</script>
 <table width="100%" border="1">
 	<thead>
 		<tr>
-			<th>problem creator</th>
 			<?php foreach($this->roles as $role) : ?>
 				<th><?php echo $role; ?></th>
 			<?php endforeach; ?>
@@ -214,8 +233,6 @@ class Allocator {
 	<tbody>
 		<?php foreach($this->workflows as $student_id => $workflow) : ?>
 			<tr <?php if ($this->contains_error($workflow)) echo 'bgcolor="orange"'; ?>>
-				<th><?php echo $this->students[$student_id]; ?></th>
-
 				<?php foreach($workflow as $role => $assigne) :
 					if ($assigne == NULL) :
 						?><td bgcolor="red">NONE</td><?php
