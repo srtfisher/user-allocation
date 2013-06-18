@@ -116,9 +116,7 @@ class Allocator {
 					$this->workflows[$workflow_id][$workflow_role] = $attempt_student;
 
 					// Remove this student off the queue to be added for such role
-					unset($this->roles_queue[$workflow_role][key($this->roles_queue[$workflow_role])]);
-					//$attempt_student = next($this->roles_queue[$workflow_role]);
-					//array_shift($this->roles_queue[$workflow_role]);
+					unset($this->roles_queue[$workflow_role][ key($this->roles_queue[$workflow_role]) ]);
 					$assigned = TRUE;
 				}
 			endforeach;
@@ -243,6 +241,41 @@ class Allocator {
 				endforeach; ?>
 			</tr>
 		<?php endforeach; ?>
+	</tbody>
+</table>
+
+<!-- Now Show a user's membership table -->
+<p>&nbsp;</p>
+
+<table width="100%" border="1">
+	<thead>
+		<tr>
+			<th>Student</th>
+
+			<?php foreach($this->roles as $role) : ?>
+				<th><?php echo $role; ?></th>
+			<?php endforeach; ?>
+		</tr>
+	</thead>
+
+	<tbody>
+		<?php foreach($this->students as $student_id => $student) : ?>
+		<tr>
+			<td><?php echo $student; ?></td>
+
+		<?php foreach($this->roles as $role) : $found = false; ?>
+			<?php
+			foreach($this->workflows as $workflow) :
+				if ($workflow[$role] !== NULL AND $workflow[$role] == $student_id) :
+					?><td bgcolor="blue">YES</td><?php
+				$found = true;
+				endif;
+			endforeach;
+			if (! $found) : ?>
+					<td bgcolor="red">NO</td>
+				<?php endif;
+		endforeach; endforeach; ?>
+	</tr>
 	</tbody>
 </table>
 
