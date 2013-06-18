@@ -30,10 +30,8 @@ class Allocator {
 		if ($size == 0)
 			$size = rand(self::$min_size, self::$max_size);
 		
-		if ($size > 50)
+		if ($size > 2999)
 			die('Size to large.');
-
-		$this->instructor = $this->random_name();
 
 		// Setup the student's names
 		for($i = 0; $i < $size; $i++)
@@ -78,10 +76,9 @@ class Allocator {
 		// Reset it
 		$this->workflows = array();
 
-		// First run, add all work flows with the respective roles not defined yet
+		// First run, add all workflows
 		foreach ($this->students as $student_id => $student)
-			$this->workflows[$student_id] = $this->empty_workflow();
-		
+			$this->workflows[] = $this->empty_workflow();
 
 		// Now let's find the assignes
 		foreach($this->roles as $role) :
@@ -93,9 +90,10 @@ class Allocator {
 		endforeach;
 
 		// Go though the workflows
-		foreach($this->workflows as $student_id => $workflow)
+		foreach($this->workflows as $workflow_id => $workflow)
 		{
 			foreach($workflow as $workflow_role => $ignore) :
+				// Start from the beginning of the queue
 				$attempt_student = reset($this->roles_queue[$workflow_role]);
 				$assigned = false;
 				$i = 0;
@@ -103,21 +101,24 @@ class Allocator {
 				while(! $assigned) {
 					$i++;
 
+					// Preventing an infinite loop
 					if ($i > count($this->roles_queue[$workflow_role]))
 						break;
 
 					// They're not a match!
-					if (! $this->can_enter_workflow($attempt_student, $this->workflows[$student_id]))
+					if (! $this->can_enter_workflow($attempt_student, $this->workflows[$workflow_id]))
 					{
 						// Point to the next student
 						$attempt_student = next($this->roles_queue[$workflow_role]);
 						continue;
 					}
 
-					$this->workflows[$student_id][$workflow_role] = $attempt_student;
+					$this->workflows[$workflow_id][$workflow_role] = $attempt_student;
 
 					// Remove this student off the queue to be added for such role
-					array_shift($this->roles_queue[$workflow_role]);
+					unset($this->roles_queue[$workflow_role][key($this->roles_queue[$workflow_role])]);
+					//$attempt_student = next($this->roles_queue[$workflow_role]);
+					//array_shift($this->roles_queue[$workflow_role]);
 					$assigned = TRUE;
 				}
 			endforeach;
@@ -212,7 +213,7 @@ class Allocator {
 		
 		// Remove the previous ones
 		$('table td[bgcolor="green"]').removeAttr('bgcolor')
-		
+
 		$('table td').each(function()
 		{
 			if ($(this).text() == name) {
