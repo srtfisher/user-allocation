@@ -51,7 +51,7 @@ class Allocator {
 		
 		if (count($this->names) == 0) :
 			$this->names = file($file);
-			shuffle($this->names);
+			//shuffle($this->names);
 		endif;
 
 		// Ensure we never repeat a name
@@ -92,33 +92,25 @@ class Allocator {
 		// Go though the workflows
 		foreach($this->workflows as $workflow_id => $workflow)
 		{
-			foreach($workflow as $workflow_role => $ignore) :
+			// Loop though each role inside of the workflow
+			// 
+			// Loop though all the users in the queue
+			// 
+			// Can join: assign and remove from queue
+			// Can't join: point to next user in queue
+			foreach($workflow as $role => $ignore) :
 				// Start from the beginning of the queue
-				$attempt_student = reset($this->roles_queue[$workflow_role]);
-				$assigned = false;
-				$i = 0;
-
-				while(! $assigned) {
-					$i++;
-
-					// Preventing an infinite loop
-					if ($i > count($this->roles_queue[$workflow_role]))
-						break;
-
-					// They're not a match!
-					if (! $this->can_enter_workflow($attempt_student, $this->workflows[$workflow_id]))
+				foreach($this->roles_queue[$role] as $queue_id => $user_id) :
+					// They're not a match -- skip to the next user in queue
+					if ($this->can_enter_workflow($user_id, $this->workflows[$workflow_id]))
 					{
-						// Point to the next student
-						$attempt_student = next($this->roles_queue[$workflow_role]);
-						continue;
+						$this->workflows[$workflow_id][$role] = $user_id;
+
+						// Remove this student from the queue
+						unset($this->roles_queue[$role][$queue_id]);
+						break;
 					}
-
-					$this->workflows[$workflow_id][$workflow_role] = $attempt_student;
-
-					// Remove this student off the queue to be added for such role
-					unset($this->roles_queue[$workflow_role][ key($this->roles_queue[$workflow_role]) ]);
-					$assigned = TRUE;
-				}
+				endforeach;
 			endforeach;
 		}
 	}
@@ -261,7 +253,7 @@ class Allocator {
 	<tbody>
 		<?php foreach($this->students as $student_id => $student) : ?>
 		<tr>
-			<td><?php echo $student; ?></td>
+			<td><?php echo $student. ' &mdash; '.$student_id; ?></td>
 
 		<?php foreach($this->roles as $role) : $found = false; ?>
 			<?php
