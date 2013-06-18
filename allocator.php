@@ -20,6 +20,8 @@ class Allocator {
 
 	private $roles_queue = array();
 
+	public $runCount = 0;
+
 	/**
 	 * @var array
 	 */
@@ -125,11 +127,11 @@ class Allocator {
 	 * @param array
 	 * @return bool
 	 */
-	public function can_enter_workflow($student, $workflow)
+	public function can_enter_workflow($user_id, $workflow)
 	{
 		foreach($workflow as $role => $assigne)
 		{
-			if ((int) $assigne == (int) $student)
+			if ($assigne !== NULL AND (int) $assigne === (int) $user_id)
 				return FALSE;
 		}
 		return TRUE;
@@ -144,8 +146,27 @@ class Allocator {
 	{
 		if ($workflow !== array_unique($workflow, SORT_NUMERIC))
 			return TRUE;
-		else
-			return FALSE;
+		
+		// Check if it contains unassigned users
+		foreach ($workflow as $role => $user) :
+			if ($user === NULL) return TRUE;
+		endforeach;
+
+		return FALSE;
+	}
+
+	/**
+	 * See if an array of workflows contains any errors
+	 *
+	 * @return bool
+	 */
+	public function contains_errors($workflows)
+	{
+		foreach($workflows as $workflow) :
+			if ($this->contains_error($workflow) ) return TRUE;
+		endforeach;
+
+		return FALSE;
 	}
 
 	/**
@@ -184,6 +205,25 @@ class Allocator {
 		return $this->workflows;
 	}
 
+	public function assignmentRun($maxRuns = 20)
+	{
+		$index = array();
+		$errorIndex = array();
+		$runCount = 0;
+
+		for ($i = 0; $i < $maxRuns; $i++) :
+			$this->runCount++;
+
+			$this->assign_users();
+
+			$hasErrors = $this->contains_errors($this->getWorkflows());
+
+			if (! $hasErrors)
+				return $this;
+		endfor;
+
+		return $this;
+	}
 
 	/**
 	 * Dump the details of the allocation
@@ -225,7 +265,7 @@ class Allocator {
 		<?php foreach($this->workflows as $student_id => $workflow) : ?>
 			<tr <?php if ($this->contains_error($workflow)) echo 'bgcolor="orange"'; ?>>
 				<?php foreach($workflow as $role => $assigne) :
-					if ($assigne == NULL) :
+					if ($assigne === NULL) :
 						?><td bgcolor="red">NONE</td><?php
 					else :
 						?><td><?php echo $this->students[$assigne]; ?></td><?php
@@ -245,7 +285,7 @@ class Allocator {
 			<th>Student</th>
 
 			<?php foreach($this->roles as $role) : ?>
-				<th><?php echo $role; ?></th>
+				<th>is <?php echo $role; ?>?</th>
 			<?php endforeach; ?>
 		</tr>
 	</thead>
@@ -253,7 +293,7 @@ class Allocator {
 	<tbody>
 		<?php foreach($this->students as $student_id => $student) : ?>
 		<tr>
-			<td><?php echo $student. ' &mdash; '.$student_id; ?></td>
+			<td><?php echo $student; ?></td>
 
 		<?php foreach($this->roles as $role) : $found = false; ?>
 			<?php
@@ -272,6 +312,10 @@ class Allocator {
 </table>
 
 <p><strong>Total Students:</strong> <?php echo count($this->students); ?></p>
+<p><strong>Total Runs:</strong> <?php echo $this->runCount; ?></p>
+<pre>
+<?php echo print_r($this->workflows); ?>
+</pre>
 <?php
 	}
 }

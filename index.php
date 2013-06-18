@@ -24,12 +24,12 @@ $allocator->create_role('evaluator 2', array('problem creator', 'problem solver'
 
 // Assign
 try {
-	$allocator->assign_users();
+	$execute = $allocator->assignmentRun();
 } catch (Exception $e) {
 	die(sprintf('ERROR: <strong>%s</strong>', $e->getMessage()));
 }
 
-$allocator->dump();
+$execute->dump();
 
 $mtime = microtime(); 
 $mtime = explode(" ",$mtime); 
