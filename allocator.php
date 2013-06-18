@@ -233,6 +233,13 @@ class Allocator {
 	public function dump()
 	{
 		?>
+<form action="/" method="GET">
+	<input type="number" name="size" value="<?php if (isset($_GET['size'])) echo $_GET['size']; ?>" />
+	<button type="submit">Generate Allocation</button>
+</form>
+
+<p><a href="/">Random Allocation</a></p>
+
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 <script type="text/javascript">
 	$(document).ready(function()
