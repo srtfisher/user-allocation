@@ -7,7 +7,6 @@
  * 
  * @license MIT
  */
-
 class Allocator {
 	private $students = array();
 	private $instructor;
